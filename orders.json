@@ -1,0 +1,20 @@
+[
+  {
+    "order_confirmed": true,
+    "phone": "номер клиента",
+    "course": "IELTS PRO",
+    "format": "1:1",
+    "goal": "IELTS 6.5+ за 2 месяца",
+    "total": 272000,
+    "timestamp": "2026-01-25T19:23:24.226441"
+  },
+  {
+    "order_confirmed": true,
+    "phone": "номер клиента",
+    "course": "IELTS PRO",
+    "format": "1:1",
+    "goal": "IELTS 6.5+ за 2 месяца",
+    "total": 272000,
+    "timestamp": "2026-01-25T19:27:02.016389"
+  }
+]

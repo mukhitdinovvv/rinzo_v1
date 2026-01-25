@@ -1,1 +1,8 @@
-".env" 
+.env
+__pycache__/
+*.pyc
+*.log
+.vscode/
+.idea/
+venv/
+receipts/
