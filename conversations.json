@@ -1,0 +1,14 @@
+{
+  "77076440186@s.whatsapp.net": {
+    "messages": [
+      {
+        "role": "user",
+        "content": "сәлеметсіз бе"
+      }
+    ],
+    "order_placed": false,
+    "waiting_for_receipt": false,
+    "airtable_record_id": null,
+    "pending_order": null
+  }
+}

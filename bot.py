@@ -11,6 +11,23 @@ from dotenv import load_dotenv
 load_dotenv()
 
 LAUNCH_TIMESTAMP = int(time.time())
+CONVERSATIONS_FILE = "conversations.json"
+
+def load_conversations():
+    if os.path.exists(CONVERSATIONS_FILE):
+        try:
+            with open(CONVERSATIONS_FILE, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except Exception as e:
+            print(f"⚠️ Ошибка загрузки диалогов: {e}")
+    return {}
+
+def save_conversations(data):
+    try:
+        with open(CONVERSATIONS_FILE, 'w', encoding='utf-8') as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        print(f"⚠️ Ошибка сохранения диалогов: {e}")
 
 # ======================== КОНФИГУРАЦИЯ ========================
 
@@ -139,7 +156,7 @@ UP-SELL ПРИМЕРЫ:
 
 client = OpenAI(api_key=PERPLEXITY_API_KEY, base_url="https://api.perplexity.ai")
 
-conversations = {}
+conversations = load_conversations()
 processed_message_ids = set()
 processed_lock = threading.Lock()
 payment_reminders = {}
@@ -162,6 +179,7 @@ def remember_user_message_only(user_phone, user_message):
     conv = ensure_conversation(user_phone)
     conv["messages"].append({"role": "user", "content": user_message})
     conv["messages"] = conv["messages"][-20:]
+    save_conversations(conversations)
     return conv
 
 def mark_message_processed(msg_id):
@@ -263,7 +281,7 @@ def create_airtable_record(order_data):
     fields = {
         "Customer_Info": f"{order_data.get('customer_name', 'Клиент')}, {order_data['phone']}",
         "Order_Details": "\n".join(order_data.get('order_items', [])),
-        "Total_Price": order_data.get('total_price', 0),
+        "Total_Price": int(order_data.get('total_price', 0)),
         "Delivery_Address": order_data.get('delivery_address', ''),
         "Is_Paid": False,
         "Kitchen_Status": "Waiting",
@@ -566,6 +584,7 @@ def get_ai_response(user_phone, user_message):
                 # Сохраняем заказ в память, но НЕ создаем запись в Airtable пока нет чека
                 conv["pending_order"] = order_data
                 conv["waiting_for_receipt"] = True
+                save_conversations(conversations)
                 
                 # Запускаем таймер напоминания
                 start_payment_reminder(user_phone)
@@ -660,6 +679,7 @@ def poll_messages():
                             conv["order_placed"] = True
                             conv["airtable_record_id"] = record_id
                             conv["pending_order"] = None # Очищаем
+                            save_conversations(conversations)
                             
                             send_message(user_phone, 
                                 "✅ Чек получен! Заказ оформлен и передан на кухню.\n"
@@ -669,6 +689,8 @@ def poll_messages():
                     else:
                         send_message(user_phone, 
                             "❌ Ошибка загрузки чека. Попробуйте еще раз.")
+            elif msg.get("type") in ["document", "image"]:
+                print(f"⚠️ Игнорирую документ от {user_phone}: не ждем чек (waiting_for_receipt={conv.get('waiting_for_receipt')})")
             
             # Обработка текстовых сообщений - собираем в список
             elif msg.get("type") == "text":
