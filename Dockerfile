@@ -17,4 +17,4 @@ COPY . .
 RUN mkdir -p receipts
 
 # Запускаем бота
-CMD ["python", "bot.py"]
+CMD ["python", "a.py"]
