@@ -24,7 +24,7 @@ def load_conversations():
 
 def save_conversations(data):
     try:
-        with open(CONVERSATIONS_FILE, 'w', encoding='utf-8') as f:
+        with open(data/CONVERSATIONS_FILE, 'w', encoding='utf-8') as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
     except Exception as e:
         print(f"⚠️ Ошибка сохранения диалогов: {e}")
